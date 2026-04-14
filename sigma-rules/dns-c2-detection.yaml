@@ -1,0 +1,39 @@
+title: Suspicious DNS Query Pattern Potential C2
+id: 9c2b6d7e-1f2a-4f8b-9d21-6e4b8b9c1234
+status: experimental
+description: |
+  Detects suspicious DNS query patterns that may indicate command-and-control (C2) activity over DNS.
+  This detection is based on observed patterns commonly used in staged payload delivery and beaconing techniques,
+  including behaviors associated with fast flux infrastructure and DNS-based covert channels.
+
+author: Curtis Sutton
+date: 2026-04-14
+
+references:
+  - https://attack.mitre.org/techniques/T1071/004/
+  - https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-093a
+  - https://www.infoblox.com/blog/security/dns-a-small-but-effective-c2-system/
+
+tags:
+  - attack.command-and-control
+  - attack.t1071.004
+
+logsource:
+  category: dns
+
+detection:
+  selection_prefix:
+    query|startswith:
+      - 'aaa.stage.'
+      - 'post.1'
+  selection_contains:
+    query|contains:
+      - '.stage.123456.'
+  condition: 1 of selection_*
+
+falsepositives:
+  - Internal staging or development domains using similar naming conventions
+  - Application telemetry or automated software update mechanisms
+  - Security testing or red team activity
+
+level: high
